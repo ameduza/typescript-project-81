@@ -1,0 +1,23 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "description": "Test project for Hexlet course",
+  "homepage": "https://github.com/ameduza/typescript-project-81#readme",
+  "bugs": {
+    "url": "https://github.com/ameduza/typescript-project-81/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ameduza/typescript-project-81.git"
+  },
+  "license": "ISC",
+  "author": "ameduza",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "typescript": "^7.0.2"
+  }
+}
