@@ -1,20 +1,22 @@
 {
   "compilerOptions": {
     "target": "ESNext",
+    "lib": ["ESNext"],
     "skipLibCheck": true,
     "noImplicitAny": true,
     "checkJs": true,
     "strict": true,
+    "declaration": true,
     "noEmit": false,
     "outDir": "./dist",
-    "moduleResolution": "bundler",
-    "module": "preserve",
+    "rootDir": ".",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "allowImportingTsExtensions": false,
     "esModuleInterop": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false
   },
-  "include": [
-    "**/*",
-  ],
+  "include": ["**/*"],
+  "exclude": ["dist", "node_modules"]
 }
