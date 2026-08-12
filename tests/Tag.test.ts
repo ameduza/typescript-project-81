@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { Tag } from '../src/Tag.js';
+import { Tag } from '../src/tag/Tag.js';
+import type { Attributes } from '../src/tag/types.js';
 import { Tag as ExportedTag } from '../index.js';
 
 describe('Tag', () => {
@@ -102,6 +103,12 @@ describe('Tag', () => {
       );
     });
 
+    it('renders the number 0 instead of treating it as falsy', () => {
+      expect(new Tag('input', { tabindex: 0 }).toString()).toBe(
+        '<input tabindex="0">',
+      );
+    });
+
     it('keeps an empty string value as an empty attribute', () => {
       expect(new Tag('input', { value: '' }).toString()).toBe(
         '<input value="">',
@@ -126,6 +133,23 @@ describe('Tag', () => {
 
     it('coerces to its markup when converted to a string', () => {
       expect(String(new Tag('br'))).toBe('<br>');
+    });
+
+    it('renders the same markup on repeated calls', () => {
+      const tag = new Tag('div', { class: 'box' }, 'x');
+      expect(tag.toString()).toBe(tag.toString());
+    });
+  });
+
+  describe('immutability', () => {
+    it('is unaffected by mutations of the attributes object', () => {
+      const attributes: Attributes = { class: 'box' };
+      const tag = new Tag('div', attributes);
+
+      attributes.class = 'changed';
+      attributes.id = 'added';
+
+      expect(tag.toString()).toBe('<div class="box"></div>');
     });
   });
 

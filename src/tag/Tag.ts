@@ -1,37 +1,14 @@
-const VOID_TAGS: ReadonlySet<string> = new Set([
-  'area',
-  'base',
-  'br',
-  'col',
-  'embed',
-  'hr',
-  'img',
-  'input',
-  'link',
-  'meta',
-  'param',
-  'source',
-  'track',
-  'wbr',
-]);
-
-/**
- * Value accepted for an attribute.
- *
- * - `string` / `number` renders as `key="value"`
- * - `true` renders the bare boolean attribute `key`
- * - `false` omits the attribute entirely
- */
-type AttributeValue = string | number | boolean;
-
-/** Attribute map accepted by {@link Tag}. */
-export type Attributes = Record<string, AttributeValue>;
+import type { Attributes } from './types.js';
+import { VOID_TAGS } from './voidElements.js';
 
 /**
  * Escapes a value for safe interpolation inside a double-quoted attribute.
  *
  * `&` must be replaced first, otherwise the ampersands introduced by the
  * later replacements would be double-escaped.
+ *
+ * Single quotes are not escaped: rendered values are always wrapped in double
+ * quotes, so `'` cannot terminate the value.
  */
 const escapeAttributeValue = (value: string): string =>
   value
@@ -47,14 +24,17 @@ export class Tag {
 
   /**
    * @param name Tag name. Matched against the void-tag list case-insensitively.
-   * @param attributes Attribute map. Values are escaped on render.
+   *   Assumed to be developer-controlled: it is rendered as-is, without
+   *   escaping or validation. The same applies to attribute keys.
+   * @param attributes Attribute map. Copied defensively, so later mutations of
+   *   the passed object do not affect this tag. Values are escaped on render.
    * @param body Raw inner HTML. Intentionally **not** escaped, so that nested
    *   `Tag` output can be composed. Callers are responsible for escaping any
    *   untrusted text before passing it here.
    */
-  constructor(name: string, attributes: Attributes = {}, body = '') {
+  constructor(name: string, attributes: Readonly<Attributes> = {}, body = '') {
     this.name = name;
-    this.attributes = attributes;
+    this.attributes = { ...attributes };
     this.body = body;
   }
 

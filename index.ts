@@ -1,2 +1,2 @@
-export { Tag } from './src/Tag.js';
-export type { Attributes } from './src/Tag.js';
+export { Tag } from './src/tag/Tag.js';
+export type { AttributeValue, Attributes } from './src/tag/types.js';
