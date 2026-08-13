@@ -14,6 +14,7 @@
 Code quality is analyzed by [SonarQube Cloud](https://sonarcloud.io) on every push to `main` and every pull request.
 
 **Coverage Setup:**
+
 - Test coverage is generated using [Vitest](https://vitest.dev/) with v8 provider
 - Coverage reports are uploaded to SonarQube Cloud with every CI run
 - Configuration: `sonar-project.properties` and `.github/workflows/ci.yml`
