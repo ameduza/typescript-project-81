@@ -15,7 +15,7 @@ form-layer concept ("where this form submits") that doesn't correspond
 1:1 to the rendering-layer `action` attribute name.
 
 Because `action` is now reachable through the pass-through map, an explicit
-`action` key in Form attributes is a type error — the options type is
+`action` key in Form attributes is a type error — the form attributes type is
 `{ url?: string } & Omit<Attributes, 'action'>`. There is exactly one way to
 set the form's submit address (`url`), and a caller can never end up with
 `url` and `action` disagreeing at runtime.
