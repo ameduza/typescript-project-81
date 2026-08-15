@@ -17,6 +17,41 @@ describe('HexletCode', () => {
 
       expect(callback).not.toHaveBeenCalled();
     });
+
+    it('translates url into the action attribute', () => {
+      expect(HexletCode.formFor({}, { url: '/users' }, () => {})).toBe(
+        '<form action="/users" method="post"></form>',
+      );
+    });
+
+    it('overrides method instead of adding a second attribute', () => {
+      expect(
+        HexletCode.formFor({}, { url: '/users', method: 'get' }, () => {}),
+      ).toBe('<form action="/users" method="get"></form>');
+    });
+
+    it('passes an extra attribute through unchanged, after the defaults', () => {
+      expect(
+        HexletCode.formFor(
+          {},
+          { url: '/users', class: 'form-horizontal' },
+          () => {},
+        ),
+      ).toBe(
+        '<form action="/users" method="post" class="form-horizontal"></form>',
+      );
+    });
+
+    it('renders an explicit empty url as action="", not the "#" default', () => {
+      expect(HexletCode.formFor({}, { url: '' }, () => {})).toBe(
+        '<form action="" method="post"></form>',
+      );
+    });
+
+    it('rejects an action key in Form attributes at compile time', () => {
+      // @ts-expect-error action is unsettable; use url instead (see docs/adr/0001-form-attributes-pass-through.md)
+      HexletCode.formFor({}, { action: '/users' }, () => {});
+    });
   });
 
   describe('public entry point', () => {

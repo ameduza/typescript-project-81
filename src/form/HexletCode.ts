@@ -5,21 +5,32 @@ export class HexletCode {
   /**
    * Builds the markup for a `<form>` tag using the {@link Tag} primitive.
    *
-   * Walking skeleton: the rendered tag only carries its built-in defaults
-   * (`action="#"`, `method="post"`). Reading fields from `template`,
-   * translating `url` into `action`, overriding `method`, passing through
-   * extra attributes, and invoking `callback` to generate fields are all
-   * later steps.
+   * `url` translates into the rendered `action` attribute, defaulting to
+   * `#` only when `url` is absent. Reading fields from `template` and
+   * invoking `callback` to generate fields are later steps.
+   *
+   * Resolved attribute order is always `action`, then `method`, then the
+   * caller's extra attributes in the order supplied. Spreading `rest` last
+   * overwrites (rather than duplicates) the `method` key in place when the
+   * caller supplies one, which is what makes it an override and not a
+   * second attribute.
    *
    * @param _template Not yet read.
-   * @param _formAttributes Not yet applied.
+   * @param formAttributes `url` plus any rendering-layer attributes to
+   *   carry on the form tag.
    * @param _callback Required, but never invoked at this step.
    */
   static formFor(
     _template: Template,
-    _formAttributes: FormAttributes,
+    formAttributes: FormAttributes,
     _callback: () => void,
   ): string {
-    return new Tag('form', { action: '#', method: 'post' }).toString();
+    const { url, ...rest } = formAttributes;
+
+    return new Tag('form', {
+      action: url ?? '#',
+      method: 'post',
+      ...rest,
+    }).toString();
   }
 }
