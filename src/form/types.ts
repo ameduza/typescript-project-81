@@ -19,3 +19,11 @@ export type FormAttributes = {
   url?: string;
   action?: never;
 } & Omit<Attributes, 'action'>;
+
+/**
+ * The field-layer map accepted by `input` after the field name: any
+ * rendering-layer attribute to carry on the field's tag. Mirrors Form
+ * attributes in shape; unlike it, nothing is stripped yet — `as` (which will
+ * be) is introduced in a follow-up ticket.
+ */
+export type FieldOptions = Attributes;
