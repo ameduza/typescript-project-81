@@ -71,9 +71,7 @@ export class FormBuilder {
 
     // Emit the label tag with capitalized first character only
     const labelText = capitalizeFirstChar(name);
-    this.fields.push(
-      new Tag('label', { for: name }, labelText).toString(),
-    );
+    this.fields.push(new Tag('label', { for: name }, labelText).toString());
 
     // `value?: never` on FieldOptions (see types.ts) is a compile-time-only
     // guard: a caller who bypasses TypeScript (e.g. via `@ts-expect-error`
