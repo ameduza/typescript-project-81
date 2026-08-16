@@ -38,6 +38,14 @@ _Avoid_: model, entity, data, record
 **`formFor`**:
 The entry point that turns a template, a set of form attributes and a field-declaring callback into a form string.
 
+**Form attributes**:
+The form-layer map accepted by `formFor` alongside the template: the form's `url` plus any rendering-layer attributes to carry on the form tag itself.
+_Avoid_: options, params, config, settings
+
+**url**:
+The address a form submits to. A form-layer concept: the rendering layer carries it as the form tag's `action` attribute, and its absence means `#`.
+_Avoid_: endpoint, target, path
+
 **Field**:
 One labelled control declared inside the `formFor` callback, bound to a template key.
 _Avoid_: control, element, widget
