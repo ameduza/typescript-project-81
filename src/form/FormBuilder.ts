@@ -1,4 +1,4 @@
-import { Tag, escapeText } from '../tag/Tag.js';
+import { escapeText } from '../tag/Tag.js';
 import type { Attributes } from '../tag/types.js';
 import type { FieldOptions, Template } from './types.js';
 
@@ -8,6 +8,52 @@ import type { FieldOptions, Template } from './types.js';
  * rather than duplicating it.
  */
 export const TEXTAREA_DEFAULTS = { cols: 20, rows: 40 } as const;
+
+/**
+ * Capitalizes the first character of a string, leaving the rest untouched.
+ * Per docs/adr/0003-form-layer-label-generation.md, this avoids complex
+ * word-splitting or multi-word title-casing logic.
+ */
+function capitalizeFirstChar(str: string): string {
+  if (str.length === 0) return str;
+  return str[0].toUpperCase() + str.slice(1);
+}
+
+/**
+ * Escapes a value for safe interpolation inside a double-quoted attribute.
+ * Matches the Tag layer's escapeAttributeValue.
+ */
+function escapeAttributeValue(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
+/**
+ * Builds an HTML attribute string from an Attributes map, escaping values.
+ * Field names (like `name` attribute) are NOT escaped (developer-controlled).
+ * Template values (like `value` attribute for input) are escaped.
+ */
+function buildAttributesString(attrs: Attributes, fieldName?: string): string {
+  return Object.entries(attrs)
+    .filter(([, value]) => value !== false)
+    .map(([key, value]) => {
+      if (value === true) {
+        return ` ${key}`;
+      }
+      // Don't escape the field name itself (e.g., the `name` attribute).
+      // Everything else gets escaped.
+      const stringValue = String(value);
+      const escaped =
+        key === 'name' && value === fieldName
+          ? stringValue
+          : escapeAttributeValue(stringValue);
+      return ` ${key}="${escaped}"`;
+    })
+    .join('');
+}
 
 /**
  * The object handed to `formFor`'s callback. Declares fields against the
@@ -31,6 +77,13 @@ export class FormBuilder {
    * docs/adr/0002-form-layer-escapes-template-values.md, a template value
    * landing in a tag's body must go through the text-escaping helper, unlike
    * a value bound to an attribute (which the tag layer escapes on render).
+   *
+   * A `<label>` is rendered immediately before the field, with `for`
+   * attribute set to the raw field name and text content being the field
+   * name with only its first character capitalized. Per
+   * docs/adr/0003-form-layer-label-generation.md, the label text is not
+   * escaped (field names are developer-controlled identifiers, same trust
+   * level as tag names) and there is no opt-out or text override.
    *
    * Resolved attribute order for a text input is always `name`, then `type`,
    * then `value` (from the template), then the caller's `fieldOptions` in
@@ -56,6 +109,12 @@ export class FormBuilder {
       throw new Error(`Field '${name}' does not exist in the template.`);
     }
 
+    // Generate the label with first character capitalized, no escaping.
+    // Field names are developer-controlled, so we construct the label
+    // manually without using Tag's attribute escaping.
+    const labelText = capitalizeFirstChar(name);
+    const label = `<label for="${name}">${labelText}</label>`;
+
     // `value?: never` on FieldOptions (see types.ts) is a compile-time-only
     // guard: a caller who bypasses TypeScript (e.g. via `@ts-expect-error`
     // or an untyped JS call) can still smuggle a `value` key through, in
@@ -68,13 +127,11 @@ export class FormBuilder {
     const value = this.template[name];
 
     if (as === 'textarea') {
-      this.fields.push(
-        new Tag(
-          'textarea',
-          { ...TEXTAREA_DEFAULTS, name, ...attributes },
-          escapeText(value),
-        ).toString(),
-      );
+      const attrs = { ...TEXTAREA_DEFAULTS, name, ...attributes };
+      const attrStr = buildAttributesString(attrs, name);
+      const body = escapeText(value);
+      const textarea = `<textarea${attrStr}>${body}</textarea>`;
+      this.fields.push(label + textarea);
       return;
     }
 
@@ -82,14 +139,24 @@ export class FormBuilder {
       throw new Error(`Unsupported 'as' value: '${String(as)}'.`);
     }
 
-    this.fields.push(
-      new Tag('input', {
-        name,
-        type: 'text',
-        value,
-        ...attributes,
-      }).toString(),
-    );
+    const attrs = { name, type: 'text', value, ...attributes };
+    const attrStr = buildAttributesString(attrs, name);
+    const input = `<input${attrStr}>`;
+    this.fields.push(label + input);
+  }
+
+  /**
+   * Declares a submit button rendered as `<input type="submit">`.
+   *
+   * @param value The button's label, rendered as the `value` attribute.
+   * @param attributes Any rendering-layer attributes to carry on the button's tag,
+   *   in addition to the built-in `type` and `value`.
+   */
+  submit(value: string, attributes: Attributes = {}): void {
+    const attrs = { type: 'submit', value, ...attributes };
+    const attrStr = buildAttributesString(attrs);
+    const input = `<input${attrStr}>`;
+    this.fields.push(input);
   }
 
   /** The accumulated fields' markup, in declaration order, no separator. */

@@ -67,6 +67,12 @@ concept: the rendering layer resolves it to a tag name, its default attributes a
 whether the field's value is carried as an attribute or as the tag's body.
 _Avoid_: type, kind, variant
 
+**Label**:
+An HTML `<label>` element automatically rendered immediately before a field's control,
+with `for` attribute bound to the field's name and text content being the field name
+with only its first character capitalized. See docs/adr/0003-form-layer-label-generation.md.
+_Avoid_: title, heading, description
+
 ### Rendering layer
 
 **Tag**:
