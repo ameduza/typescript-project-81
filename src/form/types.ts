@@ -36,7 +36,16 @@ export type FieldAs = 'textarea';
  * is stripped before the attribute spread and can never leak onto the tag as
  * `as="..."` — the same way `FormAttributes` strips `url` before turning it
  * into `action`. See docs/adr/0001-form-attributes-pass-through.md.
+ *
+ * `value` is the field's implicit value — the tag's `value` attribute for a
+ * text input, or the escaped body for a textarea
+ * (docs/adr/0002-form-layer-escapes-template-values.md). A caller passing
+ * `value` here would collide with (and, for a textarea, duplicate) that
+ * implicit value, so `value?: never` forces the same compile-time error
+ * `FormAttributes` already gives for `action` — this is a compile-time-only
+ * guard, not a runtime one; see `FormBuilder.input`.
  */
 export type FieldOptions = {
   as?: FieldAs;
-} & Omit<Attributes, 'as'>;
+  value?: never;
+} & Omit<Attributes, 'as' | 'value'>;
