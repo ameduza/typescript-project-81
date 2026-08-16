@@ -48,9 +48,11 @@ describe('HexletCode', () => {
       );
     });
 
-    it('rejects an action key in Form attributes at compile time', () => {
-      // @ts-expect-error action is unsettable; use url instead (see docs/adr/0001-form-attributes-pass-through.md)
-      HexletCode.formFor({}, { action: '/users' }, () => {});
+    it('rejects an action key at compile time, but passes it through at runtime', () => {
+      expect(
+        // @ts-expect-error action is unsettable; use url instead (see docs/adr/0001-form-attributes-pass-through.md)
+        HexletCode.formFor({}, { action: '/users' }, () => {}),
+      ).toBe('<form action="/users" method="post"></form>');
     });
   });
 
