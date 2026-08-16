@@ -21,15 +21,22 @@ export type FormAttributes = {
 } & Omit<Attributes, 'action'>;
 
 /**
- * The field-layer map accepted by `input` after the field name: any
- * rendering-layer attribute to carry on the field's tag.
+ * Which control a field renders as, instead of the default text input.
+ * A closed union: `'textarea'` is its only member today, so passing any
+ * other value is a compile-time error. A JavaScript caller that forces an
+ * unknown value through is rejected at runtime by `FormBuilder.input`.
+ */
+export type FieldAs = 'textarea';
+
+/**
+ * The field-layer map accepted by `input` after the field name: `as` plus
+ * any rendering-layer attribute to carry on the field's tag.
  *
- * `as` selects the control to render rather than being an attribute, and is
- * introduced in a follow-up ticket; until then it is rejected outright, so it
- * cannot leak onto the tag as `as="..."`. The `as?: never` carries that the
- * same way `FormAttributes` rejects `action` — see the note there for why
- * `Omit` alone can't.
+ * `as` selects the control to render rather than being an attribute, so it
+ * is stripped before the attribute spread and can never leak onto the tag as
+ * `as="..."` — the same way `FormAttributes` strips `url` before turning it
+ * into `action`. See docs/adr/0001-form-attributes-pass-through.md.
  */
 export type FieldOptions = {
-  as?: never;
+  as?: FieldAs;
 } & Omit<Attributes, 'as'>;

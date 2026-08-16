@@ -142,6 +142,74 @@ describe('HexletCode', () => {
     });
   });
 
+  describe('textarea fields', () => {
+    it('renders a textarea with the template value as its body', () => {
+      expect(
+        HexletCode.formFor({ job: 'hexlet' }, {}, (builder) => {
+          builder.input('job', { as: 'textarea' });
+        }),
+      ).toBe(
+        '<form action="#" method="post"><textarea cols="20" rows="40" name="job">hexlet</textarea></form>',
+      );
+    });
+
+    it('overrides rows and cols in place instead of appending them', () => {
+      expect(
+        HexletCode.formFor({ job: 'hexlet' }, {}, (builder) => {
+          builder.input('job', { as: 'textarea', rows: 50, cols: 50 });
+        }),
+      ).toBe(
+        '<form action="#" method="post"><textarea cols="50" rows="50" name="job">hexlet</textarea></form>',
+      );
+    });
+
+    it('appends an extra attribute after the built-in defaults', () => {
+      expect(
+        HexletCode.formFor({ job: 'hexlet' }, {}, (builder) => {
+          builder.input('job', { as: 'textarea', class: 'user-input' });
+        }),
+      ).toBe(
+        '<form action="#" method="post"><textarea cols="20" rows="40" name="job" class="user-input">hexlet</textarea></form>',
+      );
+    });
+
+    it('escapes <, > and & in the textarea body', () => {
+      expect(
+        HexletCode.formFor(
+          { job: '</textarea><script>&' },
+          {},
+          (builder) => {
+            builder.input('job', { as: 'textarea' });
+          },
+        ),
+      ).toBe(
+        '<form action="#" method="post"><textarea cols="20" rows="40" name="job">&lt;/textarea&gt;&lt;script&gt;&amp;</textarea></form>',
+      );
+    });
+
+    it('renders an empty string template value as an empty body', () => {
+      expect(
+        HexletCode.formFor({ job: '' }, {}, (builder) => {
+          builder.input('job', { as: 'textarea' });
+        }),
+      ).toBe(
+        '<form action="#" method="post"><textarea cols="20" rows="40" name="job"></textarea></form>',
+      );
+    });
+
+    it('rejects an unsupported as value at compile time, but throws at runtime', () => {
+      expect(() =>
+        HexletCode.formFor({ job: 'hexlet' }, {}, (builder) => {
+          builder.input(
+            'job',
+            // @ts-expect-error 'select' is outside the 'as' union; use 'textarea' instead
+            { as: 'select' },
+          );
+        }),
+      ).toThrow(new Error("Unsupported 'as' value: 'select'."));
+    });
+  });
+
   describe('public entry point', () => {
     it('is the package default export from index.ts', () => {
       expect(HexletCodeDefault).toBe(HexletCode);

@@ -1,5 +1,12 @@
-import { Tag } from '../tag/Tag.js';
+import { Tag, escapeText } from '../tag/Tag.js';
 import type { FieldOptions, Template } from './types.js';
+
+/**
+ * Built-in `cols`/`rows` for a textarea field, applied before the caller's
+ * `fieldOptions` so an extra `rows` or `cols` overrides the default in place
+ * rather than duplicating it.
+ */
+export const TEXTAREA_DEFAULTS = { cols: 20, rows: 40 } as const;
 
 /**
  * The object handed to `formFor`'s callback. Declares fields against the
@@ -15,24 +22,33 @@ export class FormBuilder {
   }
 
   /**
-   * Declares a text-input field bound to the template key `name`.
+   * Declares a field bound to the template key `name`.
    *
-   * Resolved attribute order is always `name`, then `type`, then `value`
-   * (from the template), then the caller's `fieldOptions` in the order
-   * supplied. Spreading `fieldOptions` last overwrites (rather than
-   * duplicates) any of those defaults in place when the caller supplies one
-   * — the same rule `formFor` already applies to `method`. The template value
-   * is bound to an attribute, so per
-   * docs/adr/0002-form-layer-escapes-template-values.md it is passed through
-   * raw and escaped by the tag layer on render; escaping it here as well
-   * would double-escape it.
+   * Renders a text input by default. When `fieldOptions.as` is `'textarea'`,
+   * renders a `<textarea>` instead, carrying the template value as the tag's
+   * escaped body rather than a `value` attribute — per
+   * docs/adr/0002-form-layer-escapes-template-values.md, a template value
+   * landing in a tag's body must go through the text-escaping helper, unlike
+   * a value bound to an attribute (which the tag layer escapes on render).
+   *
+   * Resolved attribute order for a text input is always `name`, then `type`,
+   * then `value` (from the template), then the caller's `fieldOptions` in
+   * the order supplied. For a textarea it is the built-in `cols`/`rows`
+   * defaults, then `name`, then the caller's extras. Spreading the extras
+   * last overwrites (rather than duplicates) any of those defaults in place
+   * when the caller supplies one — the same rule `formFor` already applies
+   * to `method`.
    *
    * @param name Template key this field is bound to.
-   * @param fieldOptions Extra rendering-layer attributes for the field's tag.
-   *   `as` is rejected at compile time until the follow-up ticket that
-   *   introduces it, and is dropped here so it can never reach the tag.
+   * @param fieldOptions Extra rendering-layer attributes for the field's tag,
+   *   plus `as` to select a control other than the default text input. `as`
+   *   is stripped here before the attribute spread so it can never reach the
+   *   tag.
    * @throws Error if `name` is not a key of the template (checked by key
    *   presence, not truthiness — a template value of `''` is legitimate).
+   * @throws Error if `as` is forced through (e.g. from JavaScript) with a
+   *   value outside its closed union — a TypeScript caller can never reach
+   *   this, since an unknown `as` is a compile-time error.
    */
   input(name: string, fieldOptions: FieldOptions = {}): void {
     if (!Object.hasOwn(this.template, name)) {
@@ -40,12 +56,28 @@ export class FormBuilder {
     }
 
     const { as, ...attributes } = fieldOptions;
+    const value = this.template[name];
+
+    if (as === 'textarea') {
+      this.fields.push(
+        new Tag(
+          'textarea',
+          { ...TEXTAREA_DEFAULTS, name, ...attributes },
+          escapeText(value),
+        ).toString(),
+      );
+      return;
+    }
+
+    if (as !== undefined) {
+      throw new Error(`Unsupported 'as' value: '${String(as)}'.`);
+    }
 
     this.fields.push(
       new Tag('input', {
         name,
         type: 'text',
-        value: this.template[name],
+        value,
         ...attributes,
       }).toString(),
     );
