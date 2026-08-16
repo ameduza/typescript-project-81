@@ -21,12 +21,16 @@ export class FormBuilder {
    * (from the template), then the caller's `fieldOptions` in the order
    * supplied. Spreading `fieldOptions` last overwrites (rather than
    * duplicates) any of those defaults in place when the caller supplies one
-   * — the same rule `formFor` already applies to `method`. `Tag` escapes
-   * `value` (and every other attribute) on render, so the template's raw,
-   * untrusted value is passed through unescaped here.
+   * — the same rule `formFor` already applies to `method`. The template value
+   * is bound to an attribute, so per
+   * docs/adr/0002-form-layer-escapes-template-values.md it is passed through
+   * raw and escaped by the tag layer on render; escaping it here as well
+   * would double-escape it.
    *
    * @param name Template key this field is bound to.
    * @param fieldOptions Extra rendering-layer attributes for the field's tag.
+   *   `as` is rejected at compile time until the follow-up ticket that
+   *   introduces it, and is dropped here so it can never reach the tag.
    * @throws Error if `name` is not a key of the template (checked by key
    *   presence, not truthiness — a template value of `''` is legitimate).
    */
@@ -35,12 +39,14 @@ export class FormBuilder {
       throw new Error(`Field '${name}' does not exist in the template.`);
     }
 
+    const { as, ...attributes } = fieldOptions;
+
     this.fields.push(
       new Tag('input', {
         name,
         type: 'text',
         value: this.template[name],
-        ...fieldOptions,
+        ...attributes,
       }).toString(),
     );
   }

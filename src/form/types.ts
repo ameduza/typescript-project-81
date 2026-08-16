@@ -22,8 +22,14 @@ export type FormAttributes = {
 
 /**
  * The field-layer map accepted by `input` after the field name: any
- * rendering-layer attribute to carry on the field's tag. Mirrors Form
- * attributes in shape; unlike it, nothing is stripped yet — `as` (which will
- * be) is introduced in a follow-up ticket.
+ * rendering-layer attribute to carry on the field's tag.
+ *
+ * `as` selects the control to render rather than being an attribute, and is
+ * introduced in a follow-up ticket; until then it is rejected outright, so it
+ * cannot leak onto the tag as `as="..."`. The `as?: never` carries that the
+ * same way `FormAttributes` rejects `action` — see the note there for why
+ * `Omit` alone can't.
  */
-export type FieldOptions = Attributes;
+export type FieldOptions = {
+  as?: never;
+} & Omit<Attributes, 'as'>;

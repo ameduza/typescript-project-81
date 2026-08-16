@@ -17,3 +17,11 @@ The rule is stated over template values, not over the textarea body specifically
 it already covers controls added later that render template data as body text. A
 text-escaping helper lives beside the existing attribute escaper in the tag layer,
 but the form layer decides when to call it.
+
+Deciding when to call it includes deciding _not_ to. The two halves of the rule meet
+at a value's destination: a template value bound to an attribute is escaped by the
+tag layer on render, and the form layer passes it through raw. Escaping it in the
+form layer as well would double-escape it — `<` becomes `&amp;lt;`, which renders as
+the literal text `&lt;`. So the form layer calls the text helper only for template
+values that land in a tag's body, where the tag layer escapes nothing. That is the
+case the helper exists for, and it arrives with the first control that has one.
