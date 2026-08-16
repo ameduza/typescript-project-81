@@ -33,7 +33,13 @@ const form = HexletCode.formFor(template, { url: '/users' }, (f) => {
 });
 
 console.log(form);
+```
 
+The output below has been reformatted (line breaks and indentation added) for
+readability; the actual rendered string is a single line with no separator
+between fields.
+
+```
 // <form action="/users" method="post">
 // <input name="name" type="text" value="rob">
 // <textarea cols="20" rows="40" name="job">hexlet</textarea>

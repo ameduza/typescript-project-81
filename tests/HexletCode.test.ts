@@ -89,9 +89,10 @@ describe('HexletCode', () => {
       );
     });
 
-    it('overrides the value attribute via field options', () => {
+    it('rejects a value key at compile time, but overrides at runtime if forced through', () => {
       expect(
         HexletCode.formFor({ name: 'rob' }, {}, (builder) => {
+          // @ts-expect-error value is unsettable; use the template instead
           builder.input('name', { value: 'override' });
         }),
       ).toBe(
@@ -203,6 +204,20 @@ describe('HexletCode', () => {
           );
         }),
       ).toThrow(new Error("Unsupported 'as' value: 'select'."));
+    });
+
+    it('rejects a value key at compile time, even duplicated as the body if forced through', () => {
+      expect(
+        HexletCode.formFor({ job: 'hexlet' }, {}, (builder) => {
+          builder.input('job', {
+            as: 'textarea',
+            // @ts-expect-error value is unsettable; use the template instead
+            value: 'x',
+          });
+        }),
+      ).toBe(
+        '<form action="#" method="post"><textarea cols="20" rows="40" name="job" value="x">hexlet</textarea></form>',
+      );
     });
   });
 

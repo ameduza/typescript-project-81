@@ -1,4 +1,5 @@
 import { Tag, escapeText } from '../tag/Tag.js';
+import type { Attributes } from '../tag/types.js';
 import type { FieldOptions, Template } from './types.js';
 
 /**
@@ -55,7 +56,15 @@ export class FormBuilder {
       throw new Error(`Field '${name}' does not exist in the template.`);
     }
 
-    const { as, ...attributes } = fieldOptions;
+    // `value?: never` on FieldOptions (see types.ts) is a compile-time-only
+    // guard: a caller who bypasses TypeScript (e.g. via `@ts-expect-error`
+    // or an untyped JS call) can still smuggle a `value` key through, in
+    // which case it spreads onto the tag and overrides the template's value
+    // exactly as it did before this guard existed — the same trade-off
+    // `FormAttributes` already makes for `action`. This cast just lets the
+    // (possibly still-present) rest spread onto a plain `Attributes` map.
+    const { as, ...rest } = fieldOptions;
+    const attributes = rest as Attributes;
     const value = this.template[name];
 
     if (as === 'textarea') {
