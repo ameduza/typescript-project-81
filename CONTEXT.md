@@ -46,9 +46,26 @@ _Avoid_: options, params, config, settings
 The address a form submits to. A form-layer concept: the rendering layer carries it as the form tag's `action` attribute, and its absence means `#`.
 _Avoid_: endpoint, target, path
 
+**Form builder**:
+The object handed to the `formFor` callback, which declares fields against the
+template and collects their rendered markup in declaration order.
+_Avoid_: helper, collector, form context, `f`
+
 **Field**:
 One labelled control declared inside the `formFor` callback, bound to a template key.
 _Avoid_: control, element, widget
+
+**Field options**:
+The field-layer map accepted by `input` after the field name: `as` plus any
+rendering-layer attributes to carry on the field's tag. Mirrors Form attributes,
+with `as` playing the role `url` plays there.
+_Avoid_: options, params, config, settings
+
+**as**:
+Which control a field renders as, when not the default text input. A field-layer
+concept: the rendering layer resolves it to a tag name, its default attributes and
+whether the field's value is carried as an attribute or as the tag's body.
+_Avoid_: type, kind, variant
 
 ### Rendering layer
 
