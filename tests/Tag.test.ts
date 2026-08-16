@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Tag } from '../src/tag/Tag.js';
+import { Tag, escapeText } from '../src/tag/Tag.js';
 import type { Attributes } from '../src/tag/types.js';
 import { Tag as ExportedTag } from '../index.js';
 
@@ -157,6 +157,22 @@ describe('Tag', () => {
     it('re-exports Tag from the package barrel', () => {
       expect(new ExportedTag('br').toString()).toBe('<br>');
       expect(ExportedTag).toBe(Tag);
+    });
+  });
+
+  describe('escapeText', () => {
+    it('escapes angle brackets and ampersands', () => {
+      expect(escapeText('</textarea><script>&')).toBe(
+        '&lt;/textarea&gt;&lt;script&gt;&amp;',
+      );
+    });
+
+    it('does not escape double quotes, unlike attribute escaping', () => {
+      expect(escapeText('say "hi"')).toBe('say "hi"');
+    });
+
+    it('does not double-escape ampersands', () => {
+      expect(escapeText('&')).toBe('&amp;');
     });
   });
 });

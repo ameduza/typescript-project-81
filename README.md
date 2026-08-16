@@ -21,6 +21,30 @@ Code quality is analyzed by [SonarQube Cloud](https://sonarcloud.io) on every pu
 - Local coverage report: Run `npm run test:coverage` to generate coverage locally
 - Repository requires a `SONAR_TOKEN` secret for SonarQube integration
 
+## Usage
+
+```ts
+import HexletCode from '@hexlet/code';
+
+const template = { name: 'rob', job: 'hexlet' };
+const form = HexletCode.formFor(template, { url: '/users' }, (f) => {
+  f.input('name');
+  f.input('job', { as: 'textarea' });
+});
+
+console.log(form);
+
+// <form action="/users" method="post">
+// <input name="name" type="text" value="rob">
+// <textarea cols="20" rows="40" name="job">hexlet</textarea>
+// </form>
+```
+
+`f.input(name)` renders a text input bound to `template[name]`. Passing
+`{ as: 'textarea' }` renders a `<textarea>` instead, carrying the value as
+the tag's escaped body with `cols="20" rows="40"` defaults; any extra
+attribute (e.g. `rows: 50`) overrides a default in place.
+
 ## Spec-Driven Development Workflow
 
 This project follows a **Spec-Driven Development** approach using GitHub issues and agent skills:
