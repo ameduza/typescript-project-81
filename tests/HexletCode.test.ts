@@ -175,13 +175,9 @@ describe('HexletCode', () => {
 
     it('escapes <, > and & in the textarea body', () => {
       expect(
-        HexletCode.formFor(
-          { job: '</textarea><script>&' },
-          {},
-          (builder) => {
-            builder.input('job', { as: 'textarea' });
-          },
-        ),
+        HexletCode.formFor({ job: '</textarea><script>&' }, {}, (builder) => {
+          builder.input('job', { as: 'textarea' });
+        }),
       ).toBe(
         '<form action="#" method="post"><textarea cols="20" rows="40" name="job">&lt;/textarea&gt;&lt;script&gt;&amp;</textarea></form>',
       );

@@ -7,7 +7,10 @@ import { VOID_TAGS } from './voidElements.js';
  * ampersands introduced by the later replacements would be double-escaped.
  */
 const escapeMarkup = (value: string): string =>
-  value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
 
 /**
  * Escapes a value for safe interpolation inside a double-quoted attribute.
