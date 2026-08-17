@@ -7,7 +7,7 @@ describe('HexletCode', () => {
   describe('formFor', () => {
     it('renders a bare form tag using its built-in defaults', () => {
       expect(HexletCode.formFor({}, {}, () => {})).toBe(
-        '<form action="#" method="post"></form>',
+        '<form method="post" action="#"></form>',
       );
     });
 
@@ -22,14 +22,14 @@ describe('HexletCode', () => {
 
     it('translates url into the action attribute', () => {
       expect(HexletCode.formFor({}, { url: '/users' }, () => {})).toBe(
-        '<form action="/users" method="post"></form>',
+        '<form method="post" action="/users"></form>',
       );
     });
 
     it('overrides method instead of adding a second attribute', () => {
       expect(
         HexletCode.formFor({}, { url: '/users', method: 'get' }, () => {}),
-      ).toBe('<form action="/users" method="get"></form>');
+      ).toBe('<form method="get" action="/users"></form>');
     });
 
     it('passes an extra attribute through unchanged, after the defaults', () => {
@@ -40,13 +40,13 @@ describe('HexletCode', () => {
           () => {},
         ),
       ).toBe(
-        '<form action="/users" method="post" class="form-horizontal"></form>',
+        '<form method="post" action="/users" class="form-horizontal"></form>',
       );
     });
 
     it('renders an explicit empty url as action="", not the "#" default', () => {
       expect(HexletCode.formFor({}, { url: '' }, () => {})).toBe(
-        '<form action="" method="post"></form>',
+        '<form method="post" action=""></form>',
       );
     });
 
@@ -54,7 +54,7 @@ describe('HexletCode', () => {
       expect(
         // @ts-expect-error action is unsettable; use url instead (see docs/adr/0001-form-attributes-pass-through.md)
         HexletCode.formFor({}, { action: '/users' }, () => {}),
-      ).toBe('<form action="/users" method="post"></form>');
+      ).toBe('<form method="post" action="/users"></form>');
     });
   });
 
@@ -65,7 +65,7 @@ describe('HexletCode', () => {
           builder.input('name');
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="name">Name</label><input name="name" type="text" value="rob"></form>',
+        '<form method="post" action="#"><label for="name">Name</label><input name="name" type="text" value="rob"></form>',
       );
     });
 
@@ -75,7 +75,7 @@ describe('HexletCode', () => {
           builder.input('first_name');
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="first_name">First_name</label><input name="first_name" type="text" value="rob"></form>',
+        '<form method="post" action="#"><label for="first_name">First_name</label><input name="first_name" type="text" value="rob"></form>',
       );
     });
 
@@ -85,7 +85,7 @@ describe('HexletCode', () => {
           builder.input('name', { class: 'user-input' });
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="name">Name</label><input name="name" type="text" value="rob" class="user-input"></form>',
+        '<form method="post" action="#"><label for="name">Name</label><input name="name" type="text" value="rob" class="user-input"></form>',
       );
     });
 
@@ -95,7 +95,7 @@ describe('HexletCode', () => {
           builder.input('name', { type: 'search' });
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="name">Name</label><input name="name" type="search" value="rob"></form>',
+        '<form method="post" action="#"><label for="name">Name</label><input name="name" type="search" value="rob"></form>',
       );
     });
 
@@ -106,7 +106,7 @@ describe('HexletCode', () => {
           builder.input('name', { value: 'override' });
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="name">Name</label><input name="name" type="text" value="override"></form>',
+        '<form method="post" action="#"><label for="name">Name</label><input name="name" type="text" value="override"></form>',
       );
     });
 
@@ -117,10 +117,25 @@ describe('HexletCode', () => {
           builder.input('job');
         }),
       ).toBe(
-        '<form action="#" method="post">' +
+        '<form method="post" action="#">' +
           '<label for="name">Name</label><input name="name" type="text" value="rob">' +
           '<label for="job">Job</label><input name="job" type="text" value="hexlet">' +
           '</form>',
+      );
+    });
+
+    it('renders label with custom text and HTML attributes', () => {
+      expect(
+        HexletCode.formFor({ name: 'rob' }, {}, (builder) => {
+          // @ts-expect-error labelHtml attributes conflict with the Omit index-signature workaround; runtime works correctly
+          builder.input('name', {
+            label: 'User',
+            labelHtml: { class: 'form-label', id: 'name-label' },
+          });
+          builder.submit('Ok');
+        }),
+      ).toBe(
+        '<form method="post" action="#"><label for="name" class="form-label" id="name-label">User</label><input name="name" type="text" value="rob"><input type="submit" value="Ok"></form>',
       );
     });
 
@@ -138,7 +153,7 @@ describe('HexletCode', () => {
           builder.input('name');
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="name">Name</label><input name="name" type="text" value=""></form>',
+        '<form method="post" action="#"><label for="name">Name</label><input name="name" type="text" value=""></form>',
       );
     });
 
@@ -148,7 +163,7 @@ describe('HexletCode', () => {
           builder.input('name');
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="name">Name</label><input name="name" type="text" value="&lt;script&gt;&amp;&quot;x&quot;&lt;/script&gt;"></form>',
+        '<form method="post" action="#"><label for="name">Name</label><input name="name" type="text" value="&lt;script&gt;&amp;&quot;x&quot;&lt;/script&gt;"></form>',
       );
     });
   });
@@ -160,7 +175,7 @@ describe('HexletCode', () => {
           builder.input('job', { as: 'textarea' });
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="job">Job</label><textarea cols="20" rows="40" name="job">hexlet</textarea></form>',
+        '<form method="post" action="#"><label for="job">Job</label><textarea cols="20" rows="40" name="job">hexlet</textarea></form>',
       );
     });
 
@@ -170,7 +185,7 @@ describe('HexletCode', () => {
           builder.input('job', { as: 'textarea', rows: 50, cols: 50 });
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="job">Job</label><textarea cols="50" rows="50" name="job">hexlet</textarea></form>',
+        '<form method="post" action="#"><label for="job">Job</label><textarea cols="50" rows="50" name="job">hexlet</textarea></form>',
       );
     });
 
@@ -180,7 +195,7 @@ describe('HexletCode', () => {
           builder.input('job', { as: 'textarea', class: 'user-input' });
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="job">Job</label><textarea cols="20" rows="40" name="job" class="user-input">hexlet</textarea></form>',
+        '<form method="post" action="#"><label for="job">Job</label><textarea cols="20" rows="40" name="job" class="user-input">hexlet</textarea></form>',
       );
     });
 
@@ -190,7 +205,7 @@ describe('HexletCode', () => {
           builder.input('job', { as: 'textarea' });
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="job">Job</label><textarea cols="20" rows="40" name="job">&lt;/textarea&gt;&lt;script&gt;&amp;</textarea></form>',
+        '<form method="post" action="#"><label for="job">Job</label><textarea cols="20" rows="40" name="job">&lt;/textarea&gt;&lt;script&gt;&amp;</textarea></form>',
       );
     });
 
@@ -200,7 +215,7 @@ describe('HexletCode', () => {
           builder.input('job', { as: 'textarea' });
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="job">Job</label><textarea cols="20" rows="40" name="job"></textarea></form>',
+        '<form method="post" action="#"><label for="job">Job</label><textarea cols="20" rows="40" name="job"></textarea></form>',
       );
     });
 
@@ -226,7 +241,7 @@ describe('HexletCode', () => {
           });
         }),
       ).toBe(
-        '<form action="#" method="post"><label for="job">Job</label><textarea cols="20" rows="40" name="job" value="x">hexlet</textarea></form>',
+        '<form method="post" action="#"><label for="job">Job</label><textarea cols="20" rows="40" name="job" value="x">hexlet</textarea></form>',
       );
     });
   });
@@ -238,7 +253,7 @@ describe('HexletCode', () => {
           builder.submit();
         }),
       ).toBe(
-        '<form action="#" method="post"><input type="submit" value="Save"></form>',
+        '<form method="post" action="#"><input type="submit" value="Save"></form>',
       );
     });
 
@@ -248,7 +263,7 @@ describe('HexletCode', () => {
           builder.submit('Wow');
         }),
       ).toBe(
-        '<form action="#" method="post"><input type="submit" value="Wow"></form>',
+        '<form method="post" action="#"><input type="submit" value="Wow"></form>',
       );
     });
 
@@ -268,7 +283,7 @@ describe('HexletCode', () => {
           builder.submit();
         }),
       ).toBe(
-        '<form action="#" method="post">' +
+        '<form method="post" action="#">' +
           '<label for="name">Name</label><input name="name" type="text" value="rob">' +
           '<label for="job">Job</label><input name="job" type="text" value="hexlet">' +
           '<input type="submit" value="Save">' +
@@ -283,7 +298,7 @@ describe('HexletCode', () => {
           builder.submit('Wow');
         }),
       ).toBe(
-        '<form action="#" method="post">' +
+        '<form method="post" action="#">' +
           '<input type="submit" value="Save">' +
           '<input type="submit" value="Wow">' +
           '</form>',
