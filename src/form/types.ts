@@ -44,8 +44,15 @@ export type FieldAs = 'textarea';
  * implicit value, so `value?: never` forces the same compile-time error
  * `FormAttributes` already gives for `action` — this is a compile-time-only
  * guard, not a runtime one; see `FormBuilder.input`.
+ *
+ * `label` is an optional string that will be used as custom label text,
+ * and `labelHtml` is an optional attributes map for the label tag. Both
+ * are stripped before the attribute spread and can never leak onto the
+ * field's tag.
  */
 export type FieldOptions = {
   as?: FieldAs;
   value?: never;
-} & Omit<Attributes, 'as' | 'value'>;
+  label?: string;
+  labelHtml?: Attributes;
+} & Omit<Attributes, 'as' | 'value' | 'label' | 'labelHtml'>;

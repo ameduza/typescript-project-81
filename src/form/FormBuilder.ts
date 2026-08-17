@@ -56,8 +56,10 @@ export class FormBuilder {
    * @param name Template key this field is bound to.
    * @param fieldOptions Extra rendering-layer attributes for the field's tag,
    *   plus `as` to select a control other than the default text input. `as`
-   *   is stripped here before the attribute spread so it can never reach the
-   *   tag.
+   *   is stripped here before the attribute spread so it can never leak onto the
+   *   tag. `label` overrides the default label text (first-character-only
+   *   capitalization of the field name), and `labelHtml` sets HTML attributes
+   *   on the label tag; both are stripped before the attribute spread.
    * @throws Error if `name` is not a key of the template (checked by key
    *   presence, not truthiness — a template value of `''` is legitimate).
    * @throws Error if `as` is forced through (e.g. from JavaScript) with a
@@ -69,9 +71,17 @@ export class FormBuilder {
       throw new Error(`Field '${name}' does not exist in the template.`);
     }
 
-    // Emit the label tag with capitalized first character only
-    const labelText = capitalizeFirstChar(name);
-    this.fields.push(new Tag('label', { for: name }, labelText).toString());
+    const { as, label, labelHtml, ...rest } = fieldOptions;
+    const attributes = rest as Attributes;
+    const value = this.template[name];
+
+    // Emit the label tag: use custom label text if provided, otherwise
+    // capitalize the first character of the field name. Spread labelHtml
+    // attributes after `for` so they can augment or override as needed.
+    const labelText = label ?? capitalizeFirstChar(name);
+    this.fields.push(
+      new Tag('label', { for: name, ...labelHtml }, labelText).toString(),
+    );
 
     // `value?: never` on FieldOptions (see types.ts) is a compile-time-only
     // guard: a caller who bypasses TypeScript (e.g. via `@ts-expect-error`
@@ -80,10 +90,6 @@ export class FormBuilder {
     // exactly as it did before this guard existed — the same trade-off
     // `FormAttributes` already makes for `action`. This cast just lets the
     // (possibly still-present) rest spread onto a plain `Attributes` map.
-    const { as, ...rest } = fieldOptions;
-    const attributes = rest as Attributes;
-    const value = this.template[name];
-
     if (as === 'textarea') {
       this.fields.push(
         new Tag(

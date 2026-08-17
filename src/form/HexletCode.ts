@@ -14,7 +14,7 @@ export class HexletCode {
    * the call are collected, in declaration order with no separator, as the
    * form tag's body.
    *
-   * Resolved attribute order is always `action`, then `method`, then the
+   * Resolved attribute order is always `method`, then `action`, then the
    * caller's extra attributes in the order supplied. Spreading `rest` last
    * overwrites (rather than duplicates) the `method` key in place when the
    * caller supplies one, which is what makes it an override and not a
@@ -39,8 +39,8 @@ export class HexletCode {
     return new Tag(
       'form',
       {
-        action: url ?? '#',
         method: 'post',
+        action: url ?? '#',
         ...rest,
       },
       builder.toString(),
