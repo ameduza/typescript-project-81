@@ -109,6 +109,19 @@ export class FormBuilder {
     );
   }
 
+  /**
+   * Appends a submit control, rendered as `<input type="submit" value="...">`,
+   * to the same fields collection `input()` writes to, composing in
+   * declaration order. Unlike `input()`, this never inspects the template:
+   * it takes no field name, performs no validation, and can be called any
+   * number of times (including zero) per callback.
+   *
+   * @param text The button's `value` attribute. Defaults to `'Save'`.
+   */
+  submit(text = 'Save'): void {
+    this.fields.push(new Tag('input', { type: 'submit', value: text }).toString());
+  }
+
   /** The accumulated fields' markup, in declaration order, no separator. */
   toString(): string {
     return this.fields.join('');

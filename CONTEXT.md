@@ -75,6 +75,13 @@ docs/adr/0003-auto-generated-labels.md for the generation rule). Uncustomizable 
 mandatory for every field.
 _Avoid_: field label, label text
 
+**Submit**:
+The form builder's `submit(text?)` method, which appends a submit control
+(`<input type="submit" value="...">`) to the form body. Not bound to any
+template key: it never inspects the template, defaults its text to `'Save'`,
+and can be called any number of times per callback.
+_Avoid_: submit button, submit field
+
 ### Rendering layer
 
 **Tag**:

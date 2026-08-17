@@ -30,6 +30,7 @@ const template = { name: 'rob', job: 'hexlet' };
 const form = HexletCode.formFor(template, { url: '/users' }, (f) => {
   f.input('name');
   f.input('job', { as: 'textarea' });
+  f.submit('Wow');
 });
 
 console.log(form);
@@ -39,15 +40,23 @@ console.log(form);
 // between fields.
 
 // <form action="/users" method="post">
+//   <label for="name">Name</label>
 //   <input name="name" type="text" value="rob">
+//   <label for="job">Job</label>
 //   <textarea cols="20" rows="40" name="job">hexlet</textarea>
+//   <input type="submit" value="Wow">
 // </form>
 ```
 
-`f.input(name)` renders a text input bound to `template[name]`. Passing
-`{ as: 'textarea' }` renders a `<textarea>` instead, carrying the value as
-the tag's escaped body with `cols="20" rows="40"` defaults; any extra
-attribute (e.g. `rows: 50`) overrides a default in place.
+`f.input(name)` renders a text input bound to `template[name]`, preceded by a
+`<label>` generated from `name`. Passing `{ as: 'textarea' }` renders a
+`<textarea>` instead, carrying the value as the tag's escaped body with
+`cols="20" rows="40"` defaults; any extra attribute (e.g. `rows: 50`)
+overrides a default in place.
+
+`f.submit(text?)` appends a submit button (`<input type="submit" value="...">`)
+to the form body. Defaults to `'Save'` when called with no arguments, and can
+be called any number of times.
 
 ## Spec-Driven Development Workflow
 

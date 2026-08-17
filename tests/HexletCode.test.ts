@@ -231,6 +231,62 @@ describe('HexletCode', () => {
     });
   });
 
+  describe('submit', () => {
+    it('defaults to a Save button when called with no arguments', () => {
+      expect(
+        HexletCode.formFor({}, {}, (builder) => {
+          builder.submit();
+        }),
+      ).toBe('<form action="#" method="post"><input type="submit" value="Save"></form>');
+    });
+
+    it('renders the provided text instead of the default', () => {
+      expect(
+        HexletCode.formFor({}, {}, (builder) => {
+          builder.submit('Wow');
+        }),
+      ).toBe('<form action="#" method="post"><input type="submit" value="Wow"></form>');
+    });
+
+    it('does not require or validate against a template key', () => {
+      expect(() =>
+        HexletCode.formFor({ name: 'rob' }, {}, (builder) => {
+          builder.submit();
+        }),
+      ).not.toThrow();
+    });
+
+    it('composes with fields in declaration order, concatenated with no separator', () => {
+      expect(
+        HexletCode.formFor({ name: 'rob', job: 'hexlet' }, {}, (builder) => {
+          builder.input('name');
+          builder.input('job');
+          builder.submit();
+        }),
+      ).toBe(
+        '<form action="#" method="post">' +
+          '<label for="name">Name</label><input name="name" type="text" value="rob">' +
+          '<label for="job">Job</label><input name="job" type="text" value="hexlet">' +
+          '<input type="submit" value="Save">' +
+          '</form>',
+      );
+    });
+
+    it('renders multiple submit controls in call order when called more than once', () => {
+      expect(
+        HexletCode.formFor({}, {}, (builder) => {
+          builder.submit();
+          builder.submit('Wow');
+        }),
+      ).toBe(
+        '<form action="#" method="post">' +
+          '<input type="submit" value="Save">' +
+          '<input type="submit" value="Wow">' +
+          '</form>',
+      );
+    });
+  });
+
   describe('public entry point', () => {
     it('is the package default export from index.ts', () => {
       expect(HexletCodeDefault).toBe(HexletCode);
