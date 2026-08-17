@@ -10,6 +10,15 @@ import type { FieldOptions, Template } from './types.js';
 export const TEXTAREA_DEFAULTS = { cols: 20, rows: 40 } as const;
 
 /**
+ * Capitalizes only the first character of a string, leaving the rest untouched.
+ * Used to generate label text from field names.
+ */
+function capitalizeFirstChar(str: string): string {
+  if (str.length === 0) return str;
+  return str[0].toUpperCase() + str.slice(1);
+}
+
+/**
  * The object handed to `formFor`'s callback. Declares fields against the
  * template and collects their rendered markup in declaration order, for
  * `formFor` to concatenate (no separator) into the form tag's body.
@@ -40,6 +49,10 @@ export class FormBuilder {
    * when the caller supplies one — the same rule `formFor` already applies
    * to `method`.
    *
+   * Automatically renders a `<label>` tag immediately before the field,
+   * with the `for` attribute set to the field name and the label text having
+   * only its first character capitalized.
+   *
    * @param name Template key this field is bound to.
    * @param fieldOptions Extra rendering-layer attributes for the field's tag,
    *   plus `as` to select a control other than the default text input. `as`
@@ -55,6 +68,10 @@ export class FormBuilder {
     if (!Object.hasOwn(this.template, name)) {
       throw new Error(`Field '${name}' does not exist in the template.`);
     }
+
+    // Emit the label tag with capitalized first character only
+    const labelText = capitalizeFirstChar(name);
+    this.fields.push(new Tag('label', { for: name }, labelText).toString());
 
     // `value?: never` on FieldOptions (see types.ts) is a compile-time-only
     // guard: a caller who bypasses TypeScript (e.g. via `@ts-expect-error`
@@ -89,6 +106,21 @@ export class FormBuilder {
         value,
         ...attributes,
       }).toString(),
+    );
+  }
+
+  /**
+   * Appends a submit control, rendered as `<input type="submit" value="...">`,
+   * to the same fields collection `input()` writes to, composing in
+   * declaration order. Unlike `input()`, this never inspects the template:
+   * it takes no field name, performs no validation, and can be called any
+   * number of times (including zero) per callback.
+   *
+   * @param text The button's `value` attribute. Defaults to `'Save'`.
+   */
+  submit(text = 'Save'): void {
+    this.fields.push(
+      new Tag('input', { type: 'submit', value: text }).toString(),
     );
   }
 

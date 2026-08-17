@@ -67,6 +67,21 @@ concept: the rendering layer resolves it to a tag name, its default attributes a
 whether the field's value is carried as an attribute or as the tag's body.
 _Avoid_: type, kind, variant
 
+**Label**:
+An HTML label tag automatically generated for every field, rendered immediately before
+the field's control tag. Its `for` attribute matches the field's name, and its text
+content is the field name with only its first character capitalized (see
+docs/adr/0003-auto-generated-labels.md for the generation rule). Uncustomizable and
+mandatory for every field.
+_Avoid_: field label, label text
+
+**Submit**:
+The form builder's `submit(text?)` method, which appends a submit control
+(`<input type="submit" value="...">`) to the form body. Not bound to any
+template key: it never inspects the template, defaults its text to `'Save'`,
+and can be called any number of times per callback.
+_Avoid_: submit button, submit field
+
 ### Rendering layer
 
 **Tag**:
