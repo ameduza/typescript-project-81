@@ -237,7 +237,9 @@ describe('HexletCode', () => {
         HexletCode.formFor({}, {}, (builder) => {
           builder.submit();
         }),
-      ).toBe('<form action="#" method="post"><input type="submit" value="Save"></form>');
+      ).toBe(
+        '<form action="#" method="post"><input type="submit" value="Save"></form>',
+      );
     });
 
     it('renders the provided text instead of the default', () => {
@@ -245,7 +247,9 @@ describe('HexletCode', () => {
         HexletCode.formFor({}, {}, (builder) => {
           builder.submit('Wow');
         }),
-      ).toBe('<form action="#" method="post"><input type="submit" value="Wow"></form>');
+      ).toBe(
+        '<form action="#" method="post"><input type="submit" value="Wow"></form>',
+      );
     });
 
     it('does not require or validate against a template key', () => {

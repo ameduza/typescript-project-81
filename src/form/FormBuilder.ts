@@ -119,7 +119,9 @@ export class FormBuilder {
    * @param text The button's `value` attribute. Defaults to `'Save'`.
    */
   submit(text = 'Save'): void {
-    this.fields.push(new Tag('input', { type: 'submit', value: text }).toString());
+    this.fields.push(
+      new Tag('input', { type: 'submit', value: text }).toString(),
+    );
   }
 
   /** The accumulated fields' markup, in declaration order, no separator. */
