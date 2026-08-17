@@ -18,7 +18,7 @@ const form = HexletCode.formFor(template, { method: 'post' }, (f) => {
 
 console.log(form);
 
-// <form action="#" method="post">
+// <form method="post" action="#">
 //     <label for="name">Name</label>
 //     <input name="name" type="text" value="rob">
 //     <label for="job">Job</label>
@@ -56,9 +56,9 @@ One labelled control declared inside the `formFor` callback, bound to a template
 _Avoid_: control, element, widget
 
 **Field options**:
-The field-layer map accepted by `input` after the field name: `as` plus any
-rendering-layer attributes to carry on the field's tag. Mirrors Form attributes,
-with `as` playing the role `url` plays there.
+The field-layer map accepted by `input` after the field name: `as`, `label`,
+`labelHtml`, plus any rendering-layer attributes to carry on the field's tag.
+Mirrors Form attributes, with `as` playing the role `url` plays there.
 _Avoid_: options, params, config, settings
 
 **as**:
@@ -69,10 +69,11 @@ _Avoid_: type, kind, variant
 
 **Label**:
 An HTML label tag automatically generated for every field, rendered immediately before
-the field's control tag. Its `for` attribute matches the field's name, and its text
-content is the field name with only its first character capitalized (see
-docs/adr/0003-auto-generated-labels.md for the generation rule). Uncustomizable and
-mandatory for every field.
+the field's control tag. Its `for` attribute matches the field's name. By default the
+label text is the field name with only its first character capitalized (see
+docs/adr/0003-auto-generated-labels.md for the generation rule). Label text can be
+overridden via the `label` key in field options, and HTML attributes on the label tag
+can be set via `labelHtml`. Labels remain mandatory — there is no opt-out.
 _Avoid_: field label, label text
 
 **Submit**:

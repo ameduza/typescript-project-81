@@ -56,9 +56,10 @@ export class FormBuilder {
    * @param name Template key this field is bound to.
    * @param fieldOptions Extra rendering-layer attributes for the field's tag,
    *   plus `as` to select a control other than the default text input. `as`
-   *   is stripped here before the attribute spread so it can never reach the
-   *   tag. (Note: `label` and `labelHtml` are also accepted and stripped, but
-   *   are not yet used at runtime — see docs/adr/0003-auto-generated-labels.md.)
+   *   is stripped here before the attribute spread so it can never leak onto the
+   *   tag. `label` overrides the default label text (first-character-only
+   *   capitalization of the field name), and `labelHtml` sets HTML attributes
+   *   on the label tag; both are stripped before the attribute spread.
    * @throws Error if `name` is not a key of the template (checked by key
    *   presence, not truthiness — a template value of `''` is legitimate).
    * @throws Error if `as` is forced through (e.g. from JavaScript) with a

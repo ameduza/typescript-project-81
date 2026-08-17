@@ -5,7 +5,10 @@ immediately before its own tag. The label's `for` attribute is the field's raw n
 (e.g. `first_name`), and the label's text content capitalizes only the first character
 (e.g. `first_name` → `First_name`), leaving the rest of the string untouched.
 
-There is no opt-out and no way to override the label text independently of `name`.
+This is the default generation rule when no `label` key is provided in field options.
+Label text can be overridden via the `label` key, and HTML attributes on the label tag
+can be set via `labelHtml` — both are stripped before the attribute spread and never
+leak onto the field's own tag.
 
 ## Rationale
 
@@ -19,5 +22,6 @@ readable text while honoring the developer's choice of naming style.
 ## Consequences
 
 Labels are mandatory for every field. A caller cannot render a field without its label,
-and cannot customize the label text without changing the field name — the label is
-tightly coupled to the field it precedes, always in the same declaration order.
+but can customize the label text via the `label` key and the label's HTML attributes
+via `labelHtml` in field options. When neither is provided, the label is tightly coupled
+to the field it precedes, always in the same declaration order.
